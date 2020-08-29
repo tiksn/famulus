@@ -9,6 +9,7 @@ import (
 type Config interface {
 	ListAddress() ([]string, error)
 	GetAddress(string) (string, error)
+	GetContactsCsvFilePath() (string, error)
 }
 
 type fileConfig struct {
@@ -82,4 +83,13 @@ func (c *fileConfig) GetAddress(name string) (string, error) {
 		return "", err
 	}
 	return addressMap[name].Value, nil
+}
+
+func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
+	_, contactsValueNode, err1 := findEntry(c.documentRoot.Content[0], "Contacts")
+	if err1 != nil {
+		return "", err1
+	}
+
+	return contactsValueNode.Value, nil
 }
