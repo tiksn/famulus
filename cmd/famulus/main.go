@@ -24,4 +24,10 @@ func main() {
 	cmd, _, err := rootCmd.Traverse(expandedArgs)
 	if err != nil || cmd == rootCmd {
 	}
+
+	rootCmd.SetArgs(expandedArgs)
+
+	if cmd, err := rootCmd.ExecuteC(); err != nil {
+		fmt.Fprintln(os.Stderr, cmd.UsageString())
+	}
 }
