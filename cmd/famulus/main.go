@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	config "github.com/tiksn/famulus/internal/app/famulus"
+	root "github.com/tiksn/famulus/pkg/famulus/cmd"
 )
 
 func main() {
@@ -13,17 +15,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	adrs, err2 := c.ListAddress()
-	if err2 != nil {
-		log.Fatalln(err2)
-	}
-	for _, n := range adrs {
-		fmt.Println(c.GetAddress(n))
+	expandedArgs := []string{}
+	if len(os.Args) > 0 {
+		expandedArgs = os.Args[1:]
 	}
 
-	path, err3 := c.GetContactsCsvFilePath()
-	if err3 != nil {
-		log.Fatalln(err3)
+	rootCmd := root.NewCmdRoot(&c)
+	cmd, _, err := rootCmd.Traverse(expandedArgs)
+	if err != nil || cmd == rootCmd {
 	}
-	fmt.Println(path)
 }
