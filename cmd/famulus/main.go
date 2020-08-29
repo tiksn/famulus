@@ -6,7 +6,7 @@ import (
 	"os"
 
 	config "github.com/tiksn/famulus/internal/app/famulus"
-	root "github.com/tiksn/famulus/pkg/famulus/cmd"
+	root "github.com/tiksn/famulus/pkg/famulus/cmd/root"
 )
 
 func main() {
