@@ -2,6 +2,7 @@ package collect
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
@@ -9,13 +10,13 @@ import (
 
 func NewCollectCmd(c *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "collect",
+		Use:   "collect <type> [page_number]",
 		Short: "Collect Contacts",
 		Long:  "Collect Contacts",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return collectCmd(*c, args)
 		},
-		Args: cobra.MaximumNArgs(1),
+		Args: cobra.MaximumNArgs(2),
 	}
 
 	return cmd
@@ -33,12 +34,24 @@ func collectCmd(c config.Config, args []string) error {
 			fmt.Println("Available collection option:", n)
 		}
 		return nil
-	} else if argCount == 1 {
+	} else if argCount == 1 || argCount == 2 {
 		adr, err2 := c.GetAddress(args[0])
 		if err2 != nil {
 			return err2
 		}
 		fmt.Println(adr)
+
+		pageNumber := 1
+
+		if argCount == 2 {
+			pageNumberParsed, err3 := strconv.Atoi(args[1])
+			if err3 != nil {
+				return err3
+			}
+			pageNumber = pageNumberParsed
+		}
+
+		fmt.Println(pageNumber)
 		// csv, err3 := c.GetContactsCsvFilePath()
 		// if err3 != nil {
 		// 	return err3
