@@ -3,6 +3,7 @@ package collect
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
@@ -39,7 +40,6 @@ func collectCmd(c config.Config, args []string) error {
 		if err2 != nil {
 			return err2
 		}
-		fmt.Println(adr)
 
 		pageNumber := 1
 
@@ -51,7 +51,8 @@ func collectCmd(c config.Config, args []string) error {
 			pageNumber = pageNumberParsed
 		}
 
-		fmt.Println(pageNumber)
+		adr = strings.ReplaceAll(adr, "{page_number}", strconv.Itoa(pageNumber))
+		fmt.Println(adr)
 		// csv, err3 := c.GetContactsCsvFilePath()
 		// if err3 != nil {
 		// 	return err3
