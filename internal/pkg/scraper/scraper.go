@@ -8,8 +8,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ContactScrape(url string) {
-	fmt.Printf("Scraping: %s", url)
+func ListScrape(url string) {
+	fmt.Printf("Scraping list: %s", url)
 	fmt.Println()
 
 	res, err := http.Get(url)
@@ -33,9 +33,14 @@ func ContactScrape(url string) {
 				element := element.First().Find("span a")
 				link, exists := element.Attr("href")
 				if exists {
-					fmt.Println(link)
+					ContactScrape(link)
 				}
 			}
 		})
 	})
+}
+
+func ContactScrape(url string) {
+	fmt.Printf("Scraping contact: %s", url)
+	fmt.Println()
 }
