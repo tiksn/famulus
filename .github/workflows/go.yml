@@ -34,6 +34,7 @@ jobs:
       uses: Amadevus/pwsh-script@v1.0.0
       with:
         script: |
+          Install-Module -Name psake -Force
           Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Build
 
     - name: Build
