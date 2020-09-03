@@ -28,21 +28,12 @@ func ContactScrape(url string) {
 
 	doc.Find("div.main-content").ChildrenFiltered("div").Each(func(i int, s *goquery.Selection) {
 		s.Each(func(i1 int, mainDiv *goquery.Selection) {
-			element := mainDiv.Find("table")
+			element := mainDiv.Find("table tbody tr td")
 			if element != nil {
-				element := element.Find("tbody")
-				if element != nil {
-					element := element.Find("tr")
-					if element != nil {
-						element := element.Find("td")
-						if element != nil {
-							element := element.First().Find("span a")
-							link, exists := element.Attr("href")
-							if exists {
-								fmt.Println(link)
-							}
-						}
-					}
+				element := element.First().Find("span a")
+				link, exists := element.Attr("href")
+				if exists {
+					fmt.Println(link)
 				}
 			}
 		})
