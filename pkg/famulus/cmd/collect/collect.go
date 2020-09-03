@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
+	"github.com/tiksn/famulus/internal/pkg/scraper"
 )
 
 func NewCollectCmd(c *config.Config) *cobra.Command {
@@ -58,6 +59,8 @@ func collectCmd(c config.Config, args []string) error {
 			return err3
 		}
 		fmt.Println(csv)
+
+		scraper.ContactScrape(adr)
 	}
 
 	return nil
