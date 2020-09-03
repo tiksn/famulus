@@ -53,10 +53,11 @@ func collectCmd(c config.Config, args []string) error {
 
 		adr = strings.ReplaceAll(adr, "{page_number}", strconv.Itoa(pageNumber))
 		fmt.Println(adr)
-		// csv, err3 := c.GetContactsCsvFilePath()
-		// if err3 != nil {
-		// 	return err3
-		// }
+		csv, err3 := c.GetContactsCsvFilePath()
+		if err3 != nil {
+			return err3
+		}
+		fmt.Println(csv)
 	}
 
 	return nil
