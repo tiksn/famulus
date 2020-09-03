@@ -29,17 +29,17 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-
-    - name: PowerShell script
+    - name: Prepare PowerShell
       uses: Amadevus/pwsh-script@v1.0.0
       with:
         script: |
           Install-Module -Name psake -Force
-          $psakeResult = Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Build
-          Write-Output $psakeResult
 
     - name: Build
-      run: go build -v .
-
-    - name: Test
-      run: go test -v .
+      uses: Amadevus/pwsh-script@v1.0.0
+      with:
+        script: |
+          $psakeResult = Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Build -nologo -notr
+          if(-not $psake.build_success) {
+            Set-ActionFailed
+          }
