@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
+	"github.com/tiksn/famulus/pkg/famulus/cmd/collect"
 )
 
 func NewCmdRoot(c *config.Config) *cobra.Command {
@@ -27,6 +28,8 @@ func NewCmdRoot(c *config.Config) *cobra.Command {
 			fmt.Print(versionOutput)
 		},
 	})
+
+	cmd.AddCommand(collect.NewCollectCmd(c))
 
 	return cmd
 }
