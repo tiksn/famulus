@@ -60,7 +60,7 @@ func collectCmd(c config.Config, args []string) error {
 		}
 		fmt.Println(csv)
 
-		scraper.ContactScrape(adr)
+		scraper.ListScrape(adr)
 	}
 
 	return nil
