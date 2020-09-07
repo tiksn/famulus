@@ -1,4 +1,8 @@
-Task DownloadModules {
+Task UpdateVendors {
+    Exec { go mod vendor }
+}
+
+Task DownloadModules -depends UpdateVendors {
     Exec { go mod download }
 }
 
