@@ -13,3 +13,7 @@ Task TidyModules -depends DownloadModules {
 Task Build -depends TidyModules {
     Exec { go build } -workingDirectory ..\cmd\famulus
 }
+
+Task Test -depends Build {
+    Exec { go test } -workingDirectory ..\test\
+}
