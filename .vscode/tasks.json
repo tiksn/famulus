@@ -12,6 +12,12 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "pwsh -NoProfile -Command Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Test",
+            "problemMatcher": []
         }
     ]
 }
