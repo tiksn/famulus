@@ -1,17 +1,38 @@
 package phone
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/tiksn/famulus/internal/pkg/phone"
 )
 
 func TestParse(t *testing.T) {
-	nums, err := phone.Parse("0689546321", "UA")
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
+	testData := map[string][]string{
+		"0689546321": {"0689546321"},
+		"068531":     {},
 	}
 
-	t.Log(nums)
+	for testNums, expectedNums := range testData {
+		t.Logf("Parsing %s", testNums)
+		nums, err := phone.Parse(testNums, "UA")
+		if len(expectedNums) == 0 {
+			if err == nil {
+				t.Error("Should not been parsed.")
+			} else {
+				t.Error(err)
+			}
+		} else {
+			if err != nil {
+				t.Error(err)
+			} else {
+				if !reflect.DeepEqual(nums, expectedNums) {
+					t.Errorf("Expected Numbers are %v", expectedNums)
+				}
+			}
+		}
+
+		t.Logf("Parsed Numbers are %v", nums)
+	}
+
 }
