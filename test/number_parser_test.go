@@ -9,7 +9,7 @@ import (
 
 func TestParse(t *testing.T) {
 	testData := map[string][]string{
-		"0689546321": {"0689546321"},
+		"0689546321": {"+380689546321"},
 		"068531":     {},
 	}
 
@@ -20,7 +20,7 @@ func TestParse(t *testing.T) {
 			if err == nil {
 				t.Error("Should not been parsed.")
 			} else {
-				t.Error(err)
+				t.Log(err)
 			}
 		} else {
 			if err != nil {
