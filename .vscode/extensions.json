@@ -10,7 +10,8 @@
 		"ms-vsliveshare.vsliveshare-pack",
 		"visualstudioexptteam.vscodeintellicode",
 		"redhat.vscode-yaml",
-		"ethan-reesor.vscode-go-test-adapter"
+		"ethan-reesor.vscode-go-test-adapter",
+		"hbenl.vscode-test-explorer-liveshare"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": []
