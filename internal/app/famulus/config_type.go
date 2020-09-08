@@ -2,7 +2,9 @@ package config
 
 import (
 	"errors"
+	"log"
 
+	"github.com/mitchellh/go-homedir"
 	"gopkg.in/yaml.v3"
 )
 
@@ -109,7 +111,12 @@ func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
 		return "", err1
 	}
 
-	return contactsValueNode.Value, nil
+	path, err := homedir.Expand(contactsValueNode.Value)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return path, nil
 }
 
 func (c *addressConfig) GetAddress() (string, error) {
