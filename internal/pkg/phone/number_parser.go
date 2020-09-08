@@ -1,6 +1,7 @@
 package phone
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/nyaruka/phonenumbers"
@@ -20,6 +21,11 @@ func Parse(numbers string, defaultRegion string) ([]string, error) {
 		}
 
 		snum := phonenumbers.Format(pnum, phonenumbers.E164)
+
+		if !phonenumbers.IsValidNumber(pnum) {
+			return nil, fmt.Errorf("%s Is Not Valid Number", snum)
+		}
+
 		result = append(result, snum)
 	}
 
