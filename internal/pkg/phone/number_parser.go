@@ -1,9 +1,9 @@
 package phone
 
 import (
-	"errors"
+	"fmt"
 )
 
-func parse(numbers string) ([]string, error) {
-	return nil, errors.New("Unable to parse numbers")
+func Parse(numbers string) ([]string, error) {
+	return nil, fmt.Errorf("Unable to parse numbers %s", numbers)
 }
