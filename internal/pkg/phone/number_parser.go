@@ -1,7 +1,7 @@
 package phone
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/nyaruka/phonenumbers"
 )
@@ -12,18 +12,22 @@ func Parse(numbers string, defaultRegion string) ([]string, error) {
 		return nil, err
 	}
 
+	var result []string
 	for _, num := range nums {
 		pnum, err := phonenumbers.Parse(num, defaultRegion)
 		if err != nil {
 			return nil, err
 		}
 
-		_ = pnum
+		snum := phonenumbers.Format(pnum, phonenumbers.INTERNATIONAL)
+		result = append(result, snum)
 	}
 
-	return nil, fmt.Errorf("Unable to parse numbers %s", numbers)
+	return result, nil
 }
 
 func splitNumbers(numbers string) ([]string, error) {
-	return nil, fmt.Errorf("Unable to split numbers %s", numbers)
+	nums := strings.Split(numbers, ";")
+	return nums, nil
+	// return nil, fmt.Errorf("Unable to split numbers %s", numbers)
 }
