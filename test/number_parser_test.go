@@ -11,6 +11,7 @@ func TestParse(t *testing.T) {
 	testData := map[string][]string{
 		"0689546321": {"+380689546321"},
 		"068531":     {},
+		"0689576321 ; 0689576322": {"+380689546321"},
 	}
 
 	for testNums, expectedNums := range testData {
