@@ -19,7 +19,7 @@ func Parse(numbers string, defaultRegion string) ([]string, error) {
 			return nil, err
 		}
 
-		snum := phonenumbers.Format(pnum, phonenumbers.INTERNATIONAL)
+		snum := phonenumbers.Format(pnum, phonenumbers.E164)
 		result = append(result, snum)
 	}
 
