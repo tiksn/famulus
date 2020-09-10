@@ -7,6 +7,7 @@ import (
 )
 
 type People interface {
+	SaveToFile(path string) error
 }
 
 type people struct {
@@ -33,4 +34,8 @@ func LoadFromFile(path string) (People, error) {
 	return &people{
 		records: records,
 	}, nil
+}
+
+func (c *people) SaveToFile(path string) error {
+	return nil
 }
