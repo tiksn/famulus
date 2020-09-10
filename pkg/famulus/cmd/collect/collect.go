@@ -74,7 +74,9 @@ func collectCmd(c config.Config, args []string) error {
 			return err
 		}
 
-		fmt.Println(contacts)
+		for _, contact := range contacts {
+			fmt.Println(contact)
+		}
 	}
 
 	return nil
