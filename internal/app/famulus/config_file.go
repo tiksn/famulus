@@ -2,7 +2,6 @@ package config
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 
@@ -10,20 +9,24 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ConfigDir() string {
-	dir, err := homedir.Expand("~/.config/famulus")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return dir
+func ConfigDir() (string, error) {
+	return homedir.Expand("~/.config/famulus")
 }
 
-func ConfigFile() string {
-	return path.Join(ConfigDir(), "config.yml")
+func ConfigFile() (string, error) {
+	dir, err := ConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return path.Join(dir, "config.yml"), nil
 }
 
 func ParseDefaultConfig() (Config, error) {
-	return ParseConfig(ConfigFile())
+	file, err := ConfigFile()
+	if err != nil {
+		return nil, err
+	}
+	return ParseConfig(file)
 }
 
 func ParseConfig(filename string) (Config, error) {
