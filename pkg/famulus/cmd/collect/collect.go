@@ -52,7 +52,11 @@ func collectCmd(c config.Config, args []string) error {
 			pageNumber = pageNumberParsed
 		}
 
-		adr = strings.ReplaceAll(adr, "{page_number}", strconv.Itoa(pageNumber))
+		adrUrl, err := adr.GetAddress()
+		if err != nil {
+			return err
+		}
+		adrUrl = strings.ReplaceAll(adrUrl, "{page_number}", strconv.Itoa(pageNumber))
 		fmt.Println(adr)
 		csv, err3 := c.GetContactsCsvFilePath()
 		if err3 != nil {
@@ -60,7 +64,12 @@ func collectCmd(c config.Config, args []string) error {
 		}
 		fmt.Println(csv)
 
-		scraper.ListScrape(adr)
+		phonrUrl, err := adr.GetPhoneAddress()
+		if err != nil {
+			return err
+		}
+
+		scraper.ListScrape(adrUrl, phonrUrl)
 	}
 
 	return nil
