@@ -8,12 +8,21 @@ import (
 
 type Config interface {
 	ListAddress() ([]string, error)
-	GetAddress(string) (string, error)
+	GetAddress(string) (AddressConfig, error)
 	GetContactsCsvFilePath() (string, error)
+}
+
+type AddressConfig interface {
+	GetAddress() (string, error)
+	GetPhoneAddress() (string, error)
 }
 
 type fileConfig struct {
 	documentRoot *yaml.Node
+}
+
+type addressConfig struct {
+	rootNode *yaml.Node
 }
 
 type NotFoundError struct {
@@ -51,7 +60,7 @@ func getMapEntry(node *yaml.Node) (map[string]*yaml.Node, error) {
 	return result, nil
 }
 
-func getAddressMap(c *fileConfig) (map[string]*yaml.Node, error) {
+func getAddressMap(c *fileConfig) (map[string]AddressConfig, error) {
 	_, addressesValueNode, err1 := findEntry(c.documentRoot.Content[0], "Addresses")
 	if err1 != nil {
 		return nil, err1
@@ -61,7 +70,16 @@ func getAddressMap(c *fileConfig) (map[string]*yaml.Node, error) {
 		return nil, err2
 	}
 
-	return addressMap, nil
+	result := make(map[string]AddressConfig)
+
+	/* Copy Content from Map1 to Map2*/
+	for index, element := range addressMap {
+		result[index] = &addressConfig{
+			rootNode: element,
+		}
+	}
+
+	return result, nil
 }
 
 func (c *fileConfig) ListAddress() ([]string, error) {
@@ -77,12 +95,12 @@ func (c *fileConfig) ListAddress() ([]string, error) {
 	return keys, nil
 }
 
-func (c *fileConfig) GetAddress(name string) (string, error) {
+func (c *fileConfig) GetAddress(name string) (AddressConfig, error) {
 	addressMap, err := getAddressMap(c)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return addressMap[name].Value, nil
+	return addressMap[name], nil
 }
 
 func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
@@ -92,4 +110,22 @@ func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
 	}
 
 	return contactsValueNode.Value, nil
+}
+
+func (c *addressConfig) GetAddress() (string, error) {
+	_, addressValueNode, err1 := findEntry(c.rootNode, "Address")
+	if err1 != nil {
+		return "", err1
+	}
+
+	return addressValueNode.Value, nil
+}
+
+func (c *addressConfig) GetPhoneAddress() (string, error) {
+	_, phoneAddressValueNode, err1 := findEntry(c.rootNode, "PhoneAddress")
+	if err1 != nil {
+		return "", err1
+	}
+
+	return phoneAddressValueNode.Value, nil
 }
