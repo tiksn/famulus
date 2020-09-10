@@ -69,7 +69,14 @@ func collectCmd(c config.Config, args []string) error {
 			return err
 		}
 
-		scraper.ListScrape(adrUrl, phonrUrl)
+		contacts, err := scraper.ListScrape(adrUrl, phonrUrl)
+		if err != nil {
+			return err
+		}
+
+		for _, contact := range contacts {
+			fmt.Println(contact)
+		}
 	}
 
 	return nil
