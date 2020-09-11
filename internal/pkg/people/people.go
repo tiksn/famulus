@@ -11,6 +11,7 @@ type People interface {
 }
 
 type people struct {
+	indices map[string]int
 	records [][]string
 }
 
@@ -31,7 +32,13 @@ func LoadFromFile(path string) (People, error) {
 		return nil, errors.New("No headers found")
 	}
 
+	indices := make(map[string]int)
+	for headerIndex, header := range records[0] {
+		indices[header] = headerIndex
+	}
+	records = records[1:]
 	return &people{
+		indices: indices,
 		records: records,
 	}, nil
 }
