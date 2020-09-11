@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
+	"github.com/tiksn/famulus/internal/pkg/people"
 	"github.com/tiksn/famulus/internal/pkg/scraper"
 )
 
@@ -37,19 +38,29 @@ func collectCmd(c config.Config, args []string) error {
 		}
 		return nil
 	} else if argCount == 1 || argCount == 2 {
-		adr, err2 := c.GetAddress(args[0])
-		if err2 != nil {
-			return err2
+		adr, err := c.GetAddress(args[0])
+		if err != nil {
+			return err
 		}
 
 		pageNumber := 1
 
 		if argCount == 2 {
-			pageNumberParsed, err3 := strconv.Atoi(args[1])
-			if err3 != nil {
-				return err3
+			pageNumberParsed, err := strconv.Atoi(args[1])
+			if err != nil {
+				return err
 			}
 			pageNumber = pageNumberParsed
+		}
+
+		csv, err := c.GetContactsCsvFilePath()
+		if err != nil {
+			return err
+		}
+
+		peopleDB, err := people.LoadFromFile(csv)
+		if err != nil {
+			return err
 		}
 
 		adrUrl, err := adr.GetAddress()
@@ -58,11 +69,6 @@ func collectCmd(c config.Config, args []string) error {
 		}
 		adrUrl = strings.ReplaceAll(adrUrl, "{page_number}", strconv.Itoa(pageNumber))
 		fmt.Println(adr)
-		csv, err3 := c.GetContactsCsvFilePath()
-		if err3 != nil {
-			return err3
-		}
-		fmt.Println(csv)
 
 		phonrUrl, err := adr.GetPhoneAddress()
 		if err != nil {
@@ -77,6 +83,8 @@ func collectCmd(c config.Config, args []string) error {
 		for _, contact := range contacts {
 			fmt.Println(contact)
 		}
+
+		return peopleDB.SaveToFile(csv)
 	}
 
 	return nil
