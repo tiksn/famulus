@@ -17,6 +17,7 @@ type Config interface {
 type AddressConfig interface {
 	GetAddress() (string, error)
 	GetPhoneAddress() (string, error)
+	GetDefaultRegion() (string, error)
 }
 
 type fileConfig struct {
@@ -135,4 +136,13 @@ func (c *addressConfig) GetPhoneAddress() (string, error) {
 	}
 
 	return phoneAddressValueNode.Value, nil
+}
+
+func (c *addressConfig) GetDefaultRegion() (string, error) {
+	_, regionValueNode, err1 := findEntry(c.rootNode, "Region")
+	if err1 != nil {
+		return "", err1
+	}
+
+	return regionValueNode.Value, nil
 }
