@@ -81,7 +81,7 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 			return err
 		}
 
-		contacts, err := scraper.ListScrape(adrUrl, phonrUrl)
+		contacts, err := scraper.ListScrape(adrUrl, phonrUrl, interval)
 		if err != nil {
 			return err
 		}
