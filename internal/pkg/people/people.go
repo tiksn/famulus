@@ -11,6 +11,7 @@ import (
 )
 
 type People interface {
+	AddOrUpdate(phoneNumbers []string) error
 	SaveToFile(path string) error
 }
 
@@ -79,6 +80,10 @@ func LoadFromFile(path string) (People, error) {
 }
 
 func (c *people) SaveToFile(path string) error {
+	return nil
+}
+
+func (c *people) AddOrUpdate(phoneNumbers []string) error {
 	return nil
 }
 
