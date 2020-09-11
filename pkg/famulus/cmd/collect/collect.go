@@ -18,7 +18,11 @@ func NewCollectCmd(c *config.Config) *cobra.Command {
 		Short: "Collect Contacts",
 		Long:  "Collect Contacts",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return collectCmd(*c, args)
+			interval, err := cmd.Flags().GetDuration("interval")
+			if err != nil {
+				return err
+			}
+			return collectCmd(*c, args, interval)
 		},
 		Args: cobra.MaximumNArgs(2),
 	}
@@ -27,7 +31,7 @@ func NewCollectCmd(c *config.Config) *cobra.Command {
 	return cmd
 }
 
-func collectCmd(c config.Config, args []string) error {
+func collectCmd(c config.Config, args []string, interval time.Duration) error {
 	argCount := len(args)
 
 	if argCount == 0 {
