@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
@@ -22,6 +23,7 @@ func NewCollectCmd(c *config.Config) *cobra.Command {
 		Args: cobra.MaximumNArgs(2),
 	}
 
+	cmd.Flags().DurationP("interval", "i", 5*time.Second, "Delay before making HTTP request")
 	return cmd
 }
 
