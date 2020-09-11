@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 )
 
@@ -14,8 +15,9 @@ type People interface {
 }
 
 type people struct {
-	indices map[string]int
-	records [][]string
+	indices      map[string]int
+	phoneIndices []int
+	records      [][]string
 }
 
 func LoadFromFile(path string) (People, error) {
@@ -67,10 +69,12 @@ func LoadFromFile(path string) (People, error) {
 			}
 		}
 	}
+	phoneIndices := orderPhones(categorizedIndices["Phone"])
 	records = records[1:]
 	return &people{
-		indices: indices,
-		records: records,
+		indices:      indices,
+		phoneIndices: phoneIndices,
+		records:      records,
 	}, nil
 }
 
@@ -91,4 +95,47 @@ func extractType(matches []string, re *regexp.Regexp) string {
 	}
 
 	return fmt.Sprintf("%s %s", typePrefix, typeSuffix)
+}
+
+func orderPhones(original map[string]map[int]int) []int {
+	keys := make([]string, 0, len(original))
+	for k := range original {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return getPhoneTypeOrdinal(keys[i]) < getPhoneTypeOrdinal(keys[j])
+	})
+
+	var phoneIndices []int
+	for _, v := range original {
+		for _, n := range v {
+			phoneIndices = append(phoneIndices, n)
+		}
+	}
+	return phoneIndices
+}
+
+func getPhoneTypeOrdinal(t string) int {
+
+	switch t {
+	case "Mobile":
+		return 1
+	case "Primary":
+		return 2
+	case "Home":
+		return 3
+	case "Business":
+		return 4
+	case "Car":
+		return 5
+	case "Radio":
+		return 6
+	case "Other":
+		return 7
+	case "Assistant's":
+		return 8
+
+	default:
+		return 1<<31 - 1
+	}
 }
