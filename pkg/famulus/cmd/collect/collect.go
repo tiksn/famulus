@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
 	"github.com/tiksn/famulus/internal/pkg/people"
+	"github.com/tiksn/famulus/internal/pkg/phone"
 	"github.com/tiksn/famulus/internal/pkg/scraper"
 )
 
@@ -74,7 +75,6 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 			return err
 		}
 		adrUrl = strings.ReplaceAll(adrUrl, "{page_number}", strconv.Itoa(pageNumber))
-		fmt.Println(adr)
 
 		phonrUrl, err := adr.GetPhoneAddress()
 		if err != nil {
@@ -87,10 +87,25 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 		}
 
 		for _, contact := range contacts {
-			fmt.Println(contact)
+			region, err := adr.GetDefaultRegion()
+			if err != nil {
+				return err
+			}
+			numbers, err := phone.Parse(contact.GetNumbers(), region)
+			if err != nil {
+				return err
+			}
+
+			err = peopleDB.AddOrUpdate(numbers)
+			if err != nil {
+				return err
+			}
 		}
 
-		return peopleDB.SaveToFile(csv)
+		err = peopleDB.SaveToFile(csv)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
