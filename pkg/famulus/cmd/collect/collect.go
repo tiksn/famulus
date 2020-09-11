@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	config "github.com/tiksn/famulus/internal/app/famulus"
@@ -17,15 +18,20 @@ func NewCollectCmd(c *config.Config) *cobra.Command {
 		Short: "Collect Contacts",
 		Long:  "Collect Contacts",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return collectCmd(*c, args)
+			interval, err := cmd.Flags().GetDuration("interval")
+			if err != nil {
+				return err
+			}
+			return collectCmd(*c, args, interval)
 		},
 		Args: cobra.MaximumNArgs(2),
 	}
 
+	cmd.Flags().DurationP("interval", "i", 5*time.Second, "Delay before making HTTP request")
 	return cmd
 }
 
-func collectCmd(c config.Config, args []string) error {
+func collectCmd(c config.Config, args []string, interval time.Duration) error {
 	argCount := len(args)
 
 	if argCount == 0 {
@@ -75,7 +81,7 @@ func collectCmd(c config.Config, args []string) error {
 			return err
 		}
 
-		contacts, err := scraper.ListScrape(adrUrl, phonrUrl)
+		contacts, err := scraper.ListScrape(adrUrl, phonrUrl, interval)
 		if err != nil {
 			return err
 		}

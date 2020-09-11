@@ -6,14 +6,16 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ListScrape(url string, phoneUrl string) ([]Contact, error) {
+func ListScrape(url string, phoneUrl string, interval time.Duration) ([]Contact, error) {
 	fmt.Printf("Scraping list: %s", url)
 	fmt.Println()
 
+	time.Sleep(interval)
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -37,7 +39,7 @@ func ListScrape(url string, phoneUrl string) ([]Contact, error) {
 				element := element.First().Find("span a")
 				link, exists := element.Attr("href")
 				if exists {
-					contact, err := ContactScrape(link, phoneUrl)
+					contact, err := ContactScrape(link, phoneUrl, interval)
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -52,10 +54,11 @@ func ListScrape(url string, phoneUrl string) ([]Contact, error) {
 	return result, nil
 }
 
-func ContactScrape(url string, phoneUrl string) (Contact, error) {
+func ContactScrape(url string, phoneUrl string, interval time.Duration) (Contact, error) {
 	fmt.Printf("Scraping contact: %s", url)
 	fmt.Println()
 
+	time.Sleep(interval)
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -78,7 +81,7 @@ func ContactScrape(url string, phoneUrl string) (Contact, error) {
 			re := regexp.MustCompile("^\\s*showPhonesWithDigits\\(\\'(?P<id>\\d*)\\',\\s*\\'(?P<key>[A-Fa-f0-9]{40})\\'\\)\\;\\s*return\\s*false\\s*\\;\\s*$")
 			matches := re.FindStringSubmatch(onclick)
 
-			nums, err := NumbersScrape(matches[re.SubexpIndex("id")], matches[re.SubexpIndex("key")], phoneUrl)
+			nums, err := NumbersScrape(matches[re.SubexpIndex("id")], matches[re.SubexpIndex("key")], phoneUrl, interval)
 			if err != nil {
 				return nil, err
 			}
@@ -92,10 +95,11 @@ func ContactScrape(url string, phoneUrl string) (Contact, error) {
 	return nil, errors.New("Unable to find contact information")
 }
 
-func NumbersScrape(id string, key string, phoneUrl string) (string, error) {
+func NumbersScrape(id string, key string, phoneUrl string, interval time.Duration) (string, error) {
 	payload := strings.NewReader(fmt.Sprintf("i=%s&s=%s", id, key))
 
 	client := &http.Client{}
+	time.Sleep(interval)
 	req, err := http.NewRequest("POST", phoneUrl, payload)
 
 	if err != nil {
