@@ -84,7 +84,56 @@ func (c *people) SaveToFile(path string) error {
 }
 
 func (c *people) AddOrUpdate(phoneNumbers []string) error {
+	i, found, err := c.findRecordIndexByNumbers(phoneNumbers)
+	if err != nil {
+		return err
+	}
+
+	if found {
+		updatePhonenumbers(phoneNumbers, c.records[i], c.phoneIndices)
+	} else {
+		newRecord := make([]string, len(c.indices))
+
+		updatePhonenumbers(phoneNumbers, newRecord, c.phoneIndices)
+
+		c.records = append(c.records, newRecord)
+	}
+
 	return nil
+}
+
+func (c *people) findRecordIndexByNumbers(phoneNumbers []string) (int, bool, error) {
+	for _, phoneNumber := range phoneNumbers {
+		i, found, err := c.findRecordIndexByNumber(phoneNumber)
+
+		if err != nil {
+			return 0, false, err
+		}
+
+		if found {
+			return i, true, nil
+		}
+	}
+
+	return 0, false, nil
+}
+
+func (c *people) findRecordIndexByNumber(phoneNumber string) (int, bool, error) {
+	for i, record := range c.records {
+		for _, phoneIndex := range c.phoneIndices {
+			if record[phoneIndex] == phoneNumber {
+				return i, true, nil
+			}
+		}
+	}
+
+	return 0, false, nil
+}
+
+func updatePhonenumbers(phoneNumbers []string, record []string, phoneIndices []int) {
+	for i := 0; i < len(phoneIndices) && i < len(phoneNumbers); i++ {
+		record[phoneIndices[i]] = phoneNumbers[i]
+	}
 }
 
 func extractType(matches []string, re *regexp.Regexp) string {
