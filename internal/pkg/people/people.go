@@ -16,9 +16,10 @@ type People interface {
 }
 
 type people struct {
-	indices      map[string]int
-	phoneIndices []int
-	records      [][]string
+	indices       map[string]int
+	phoneIndices  []int
+	headerRecords []string
+	records       [][]string
 }
 
 func LoadFromFile(path string) (People, error) {
@@ -71,16 +72,31 @@ func LoadFromFile(path string) (People, error) {
 		}
 	}
 	phoneIndices := orderPhones(categorizedIndices["Phone"])
+	headerRecords := records[0]
 	records = records[1:]
 	return &people{
-		indices:      indices,
-		phoneIndices: phoneIndices,
-		records:      records,
+		indices:       indices,
+		phoneIndices:  phoneIndices,
+		headerRecords: headerRecords,
+		records:       records,
 	}, nil
 }
 
 func (c *people) SaveToFile(path string) error {
-	return nil
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	allRecords := append(c.records, c.headerRecords)
+	last := len(allRecords) - 1
+	copy(allRecords[1:], allRecords[:last])
+	allRecords[0] = c.headerRecords
+	return writer.WriteAll(allRecords)
 }
 
 func (c *people) AddOrUpdate(phoneNumbers []string) error {
