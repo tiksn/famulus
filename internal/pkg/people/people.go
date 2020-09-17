@@ -176,9 +176,13 @@ func orderPhones(original map[string]map[int]int) []int {
 		return getPhoneTypeOrdinal(keys[i]) < getPhoneTypeOrdinal(keys[j])
 	})
 
+	return flattenIndexHierarchy(original, keys)
+}
+
+func flattenIndexHierarchy(original map[string]map[int]int, orderedKeys []string) []int {
 	var phoneIndices []int
-	for _, v := range original {
-		for _, n := range v {
+	for _, k := range orderedKeys {
+		for _, n := range original[k] {
 			phoneIndices = append(phoneIndices, n)
 		}
 	}
