@@ -22,6 +22,8 @@ type people struct {
 	records       [][]string
 }
 
+type getTypeOrdinal func(t string) int
+
 func LoadFromFile(path string) (People, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -168,20 +170,20 @@ func extractType(matches []string, re *regexp.Regexp) string {
 }
 
 func orderPhones(original map[string]map[int]int) []int {
+	return flattenIndexHierarchy(original, getPhoneTypeOrdinal)
+}
+
+func flattenIndexHierarchy(original map[string]map[int]int, getOrdinal getTypeOrdinal) []int {
 	keys := make([]string, 0, len(original))
 	for k := range original {
 		keys = append(keys, k)
 	}
 	sort.Slice(keys, func(i, j int) bool {
-		return getPhoneTypeOrdinal(keys[i]) < getPhoneTypeOrdinal(keys[j])
+		return getOrdinal(keys[i]) < getOrdinal(keys[j])
 	})
 
-	return flattenIndexHierarchy(original, keys)
-}
-
-func flattenIndexHierarchy(original map[string]map[int]int, orderedKeys []string) []int {
 	var phoneIndices []int
-	for _, k := range orderedKeys {
+	for _, k := range keys {
 		for _, n := range original[k] {
 			phoneIndices = append(phoneIndices, n)
 		}
