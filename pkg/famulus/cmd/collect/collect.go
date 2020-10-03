@@ -100,6 +100,11 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 			if err != nil {
 				return err
 			}
+
+			err = peopleDB.AddOrUpdateWebsites([]string{contact.GetWebsite()})
+			if err != nil {
+				return err
+			}
 		}
 
 		err = peopleDB.SaveToFile(csv)
