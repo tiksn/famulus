@@ -11,7 +11,7 @@ import (
 )
 
 type People interface {
-	AddOrUpdate(phoneNumbers []string) error
+	AddOrUpdatePhones(phoneNumbers []string) error
 	SaveToFile(path string) error
 }
 
@@ -118,7 +118,7 @@ func (c *people) SaveToFile(path string) error {
 	return writer.WriteAll(allRecords)
 }
 
-func (c *people) AddOrUpdate(phoneNumbers []string) error {
+func (c *people) AddOrUpdatePhones(phoneNumbers []string) error {
 	i, found, err := c.findRecordIndexByNumbers(phoneNumbers)
 	if err != nil {
 		return err
