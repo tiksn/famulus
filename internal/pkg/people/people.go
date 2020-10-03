@@ -12,7 +12,7 @@ import (
 
 type People interface {
 	AddOrUpdatePhones(phoneNumbers []string) error
-	// AddOrUpdateWebsites(websites []string) error
+	AddOrUpdateWebsites(websites []string) error
 	SaveToFile(path string) error
 }
 
@@ -120,17 +120,25 @@ func (c *people) SaveToFile(path string) error {
 }
 
 func (c *people) AddOrUpdatePhones(phoneNumbers []string) error {
-	i, found, err := c.findRecordIndexByValues(phoneNumbers, c.phoneIndices)
+	return c.addOrUpdateValues(phoneNumbers, c.phoneIndices)
+}
+
+func (c *people) AddOrUpdateWebsites(phoneNumbers []string) error {
+	return c.addOrUpdateValues(phoneNumbers, c.websiteIndices)
+}
+
+func (c *people) addOrUpdateValues(values []string, indices []int) error {
+	i, found, err := c.findRecordIndexByValues(values, indices)
 	if err != nil {
 		return err
 	}
 
 	if found {
-		updateValues(phoneNumbers, c.records[i], c.phoneIndices)
+		updateValues(values, c.records[i], indices)
 	} else {
 		newRecord := make([]string, len(c.indices))
 
-		updateValues(phoneNumbers, newRecord, c.phoneIndices)
+		updateValues(values, newRecord, indices)
 
 		c.records = append(c.records, newRecord)
 	}
