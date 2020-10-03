@@ -96,7 +96,7 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 				return err
 			}
 
-			err = peopleDB.AddOrUpdate(numbers)
+			err = peopleDB.AddOrUpdatePhones(numbers)
 			if err != nil {
 				return err
 			}
