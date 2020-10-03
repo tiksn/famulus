@@ -88,6 +88,7 @@ func ContactScrape(url string, phoneUrl string, interval time.Duration) (Contact
 
 			return &contact{
 				numbers: nums,
+				website: url,
 			}, nil
 		}
 	}
