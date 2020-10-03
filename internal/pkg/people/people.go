@@ -11,18 +11,24 @@ import (
 )
 
 type People interface {
-	AddOrUpdate(phoneNumbers []string) error
+	AddOrUpdate(phoneNumbers []string, websites []string) error
 	SaveToFile(path string) error
 }
 
 type people struct {
-	indices       map[string]int
-	phoneIndices  []int
-	headerRecords []string
-	records       [][]string
+	indices        map[string]int
+	phoneIndices   []int
+	websiteIndices []int
+	headerRecords  []string
+	records        [][]string
 }
 
 type getTypeOrdinal func(t string) int
+
+var theREs = map[string]*regexp.Regexp{
+	"Phone":   regexp.MustCompile("^(?P<type_prefix>(\\w*\\'*(\\s*\\w)*))\\s*Phone\\s*(?P<number>\\d*)\\s*(?P<type_suffix>\\w*)$"),
+	"Website": regexp.MustCompile("^(?P<type_prefix>(\\w*))\\s*Web Page\\s*(?P<number>\\d*)\\s*(?P<type_suffix>\\w*)$"),
+}
 
 func LoadFromFile(path string) (People, error) {
 	file, err := os.Open(path)
@@ -43,44 +49,55 @@ func LoadFromFile(path string) (People, error) {
 
 	indices := make(map[string]int)
 	categorizedIndices := map[string]map[string]map[int]int{
-		"Phone":  make(map[string]map[int]int),
-		"Others": make(map[string]map[int]int),
+		"Phone":   make(map[string]map[int]int),
+		"Website": make(map[string]map[int]int),
+		"Others":  make(map[string]map[int]int),
 	}
-	phoneRE := regexp.MustCompile("^(?P<type_prefix>(\\w*\\'*\\w*))\\s*Phone\\s*(?P<number>\\d*)\\s*(?P<type_suffix>\\w*)$")
+
 	for headerIndex, header := range records[0] {
 		indices[header] = headerIndex
-
-		matches := phoneRE.FindStringSubmatch(header)
-		if matches != nil {
-			t := extractType(matches, phoneRE)
-			number := matches[phoneRE.SubexpIndex("number")]
-			if categorizedIndices["Phone"][t] == nil {
-				categorizedIndices["Phone"][t] = make(map[int]int)
-			}
-
-			if number == "" {
-				categorizedIndices["Phone"][t][1] = headerIndex
-			} else {
-				i, err := strconv.Atoi(number)
-				if err != nil {
-					return nil, err
+		found := false
+		for category, theRE := range theREs {
+			matches := theRE.FindStringSubmatch(header)
+			if matches != nil {
+				t := extractType(matches, theRE)
+				number := matches[theRE.SubexpIndex("number")]
+				if categorizedIndices[category][t] == nil {
+					categorizedIndices[category][t] = make(map[int]int)
 				}
-				categorizedIndices["Phone"][t][i] = headerIndex
+
+				if number == "" {
+					categorizedIndices[category][t][1] = headerIndex
+				} else {
+					i, err := strconv.Atoi(number)
+					if err != nil {
+						return nil, err
+					}
+					categorizedIndices[category][t][i] = headerIndex
+				}
+
+				found = true
+				break
 			}
-		} else {
+		}
+
+		if !found {
 			categorizedIndices["Others"][header] = map[int]int{
 				1: headerIndex,
 			}
 		}
 	}
+
 	phoneIndices := orderPhones(categorizedIndices["Phone"])
+	websiteIndices := orderWebsites(categorizedIndices["Website"])
 	headerRecords := records[0]
 	records = records[1:]
 	return &people{
-		indices:       indices,
-		phoneIndices:  phoneIndices,
-		headerRecords: headerRecords,
-		records:       records,
+		indices:        indices,
+		phoneIndices:   phoneIndices,
+		websiteIndices: websiteIndices,
+		headerRecords:  headerRecords,
+		records:        records,
 	}, nil
 }
 
@@ -101,18 +118,20 @@ func (c *people) SaveToFile(path string) error {
 	return writer.WriteAll(allRecords)
 }
 
-func (c *people) AddOrUpdate(phoneNumbers []string) error {
-	i, found, err := c.findRecordIndexByNumbers(phoneNumbers)
+func (c *people) AddOrUpdate(phoneNumbers []string, websites []string) error {
+	i, found, err := c.findRecordIndexByValues(phoneNumbers, c.phoneIndices)
 	if err != nil {
 		return err
 	}
 
 	if found {
-		updatePhonenumbers(phoneNumbers, c.records[i], c.phoneIndices)
+		updateValues(phoneNumbers, c.records[i], c.phoneIndices)
+		updateValues(websites, c.records[i], c.websiteIndices)
 	} else {
 		newRecord := make([]string, len(c.indices))
 
-		updatePhonenumbers(phoneNumbers, newRecord, c.phoneIndices)
+		updateValues(phoneNumbers, newRecord, c.phoneIndices)
+		updateValues(websites, newRecord, c.websiteIndices)
 
 		c.records = append(c.records, newRecord)
 	}
@@ -120,9 +139,9 @@ func (c *people) AddOrUpdate(phoneNumbers []string) error {
 	return nil
 }
 
-func (c *people) findRecordIndexByNumbers(phoneNumbers []string) (int, bool, error) {
-	for _, phoneNumber := range phoneNumbers {
-		i, found, err := c.findRecordIndexByNumber(phoneNumber)
+func (c *people) findRecordIndexByValues(values []string, indices []int) (int, bool, error) {
+	for _, value := range values {
+		i, found, err := c.findRecordIndexByValue(value, indices)
 
 		if err != nil {
 			return 0, false, err
@@ -136,10 +155,10 @@ func (c *people) findRecordIndexByNumbers(phoneNumbers []string) (int, bool, err
 	return 0, false, nil
 }
 
-func (c *people) findRecordIndexByNumber(phoneNumber string) (int, bool, error) {
+func (c *people) findRecordIndexByValue(value string, indices []int) (int, bool, error) {
 	for i, record := range c.records {
-		for _, phoneIndex := range c.phoneIndices {
-			if record[phoneIndex] == phoneNumber {
+		for _, idx := range indices {
+			if record[idx] == value {
 				return i, true, nil
 			}
 		}
@@ -148,9 +167,9 @@ func (c *people) findRecordIndexByNumber(phoneNumber string) (int, bool, error) 
 	return 0, false, nil
 }
 
-func updatePhonenumbers(phoneNumbers []string, record []string, phoneIndices []int) {
-	for i := 0; i < len(phoneIndices) && i < len(phoneNumbers); i++ {
-		record[phoneIndices[i]] = phoneNumbers[i]
+func updateValues(values []string, record []string, indices []int) {
+	for i := 0; i < len(indices) && i < len(values); i++ {
+		record[indices[i]] = values[i]
 	}
 }
 
@@ -171,6 +190,10 @@ func extractType(matches []string, re *regexp.Regexp) string {
 
 func orderPhones(original map[string]map[int]int) []int {
 	return flattenIndexHierarchy(original, getPhoneTypeOrdinal)
+}
+
+func orderWebsites(original map[string]map[int]int) []int {
+	return flattenIndexHierarchy(original, getWebsitesTypeOrdinal)
 }
 
 func flattenIndexHierarchy(original map[string]map[int]int, getOrdinal getTypeOrdinal) []int {
@@ -202,16 +225,30 @@ func getPhoneTypeOrdinal(t string) int {
 		return 3
 	case "Business":
 		return 4
-	case "Car":
+	case "Company Main":
 		return 5
-	case "Radio":
+	case "Car":
 		return 6
-	case "Other":
+	case "Radio":
 		return 7
-	case "Assistant's":
+	case "Other":
 		return 8
+	case "Assistant's":
+		return 9
 
 	default:
 		return 1<<31 - 1
 	}
+}
+
+func getWebsitesTypeOrdinal(t string) int {
+	switch t {
+	case "":
+		return 1
+	case "Personal":
+		return 2
+	default:
+		return 1<<31 - 1
+	}
+
 }
