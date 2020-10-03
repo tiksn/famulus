@@ -11,8 +11,7 @@ import (
 )
 
 type People interface {
-	AddOrUpdatePhones(phoneNumbers []string) error
-	AddOrUpdateWebsites(websites []string) error
+	AddOrUpdate(phoneNumbers []string, websites []string) error
 	SaveToFile(path string) error
 }
 
@@ -119,26 +118,20 @@ func (c *people) SaveToFile(path string) error {
 	return writer.WriteAll(allRecords)
 }
 
-func (c *people) AddOrUpdatePhones(phoneNumbers []string) error {
-	return c.addOrUpdateValues(phoneNumbers, c.phoneIndices)
-}
-
-func (c *people) AddOrUpdateWebsites(phoneNumbers []string) error {
-	return c.addOrUpdateValues(phoneNumbers, c.websiteIndices)
-}
-
-func (c *people) addOrUpdateValues(values []string, indices []int) error {
-	i, found, err := c.findRecordIndexByValues(values, indices)
+func (c *people) AddOrUpdate(phoneNumbers []string, websites []string) error {
+	i, found, err := c.findRecordIndexByValues(phoneNumbers, c.phoneIndices)
 	if err != nil {
 		return err
 	}
 
 	if found {
-		updateValues(values, c.records[i], indices)
+		updateValues(phoneNumbers, c.records[i], c.phoneIndices)
+		updateValues(websites, c.records[i], c.websiteIndices)
 	} else {
 		newRecord := make([]string, len(c.indices))
 
-		updateValues(values, newRecord, indices)
+		updateValues(phoneNumbers, newRecord, c.phoneIndices)
+		updateValues(websites, newRecord, c.websiteIndices)
 
 		c.records = append(c.records, newRecord)
 	}
