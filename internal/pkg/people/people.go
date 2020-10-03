@@ -12,6 +12,7 @@ import (
 
 type People interface {
 	AddOrUpdatePhones(phoneNumbers []string) error
+	// AddOrUpdateWebsites(websites []string) error
 	SaveToFile(path string) error
 }
 
@@ -119,17 +120,17 @@ func (c *people) SaveToFile(path string) error {
 }
 
 func (c *people) AddOrUpdatePhones(phoneNumbers []string) error {
-	i, found, err := c.findRecordIndexByNumbers(phoneNumbers)
+	i, found, err := c.findRecordIndexByValues(phoneNumbers, c.phoneIndices)
 	if err != nil {
 		return err
 	}
 
 	if found {
-		updatePhonenumbers(phoneNumbers, c.records[i], c.phoneIndices)
+		updateValues(phoneNumbers, c.records[i], c.phoneIndices)
 	} else {
 		newRecord := make([]string, len(c.indices))
 
-		updatePhonenumbers(phoneNumbers, newRecord, c.phoneIndices)
+		updateValues(phoneNumbers, newRecord, c.phoneIndices)
 
 		c.records = append(c.records, newRecord)
 	}
@@ -137,9 +138,9 @@ func (c *people) AddOrUpdatePhones(phoneNumbers []string) error {
 	return nil
 }
 
-func (c *people) findRecordIndexByNumbers(phoneNumbers []string) (int, bool, error) {
-	for _, phoneNumber := range phoneNumbers {
-		i, found, err := c.findRecordIndexByNumber(phoneNumber)
+func (c *people) findRecordIndexByValues(values []string, indices []int) (int, bool, error) {
+	for _, value := range values {
+		i, found, err := c.findRecordIndexByValue(value, indices)
 
 		if err != nil {
 			return 0, false, err
@@ -153,10 +154,10 @@ func (c *people) findRecordIndexByNumbers(phoneNumbers []string) (int, bool, err
 	return 0, false, nil
 }
 
-func (c *people) findRecordIndexByNumber(phoneNumber string) (int, bool, error) {
+func (c *people) findRecordIndexByValue(value string, indices []int) (int, bool, error) {
 	for i, record := range c.records {
-		for _, phoneIndex := range c.phoneIndices {
-			if record[phoneIndex] == phoneNumber {
+		for _, idx := range indices {
+			if record[idx] == value {
 				return i, true, nil
 			}
 		}
@@ -165,9 +166,9 @@ func (c *people) findRecordIndexByNumber(phoneNumber string) (int, bool, error) 
 	return 0, false, nil
 }
 
-func updatePhonenumbers(phoneNumbers []string, record []string, phoneIndices []int) {
-	for i := 0; i < len(phoneIndices) && i < len(phoneNumbers); i++ {
-		record[phoneIndices[i]] = phoneNumbers[i]
+func updateValues(values []string, record []string, indices []int) {
+	for i := 0; i < len(indices) && i < len(values); i++ {
+		record[indices[i]] = values[i]
 	}
 }
 
