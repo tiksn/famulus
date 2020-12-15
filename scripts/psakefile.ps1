@@ -70,5 +70,7 @@ Task BuildLinux64 -Depends PreBuild {
 Task Build -Depends BuildWinx64, BuildWinx86, BuildLinux64
 
 Task Test -depends Build {
-    Exec { go test } -workingDirectory ..\test\
+    $env:GOOS = ""
+    $env:GOARCH = ""
+    Exec { go test .\test\ } -workingDirectory $script:rootFolder
 }
