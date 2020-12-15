@@ -20,14 +20,14 @@ Task DownloadModules -depends UpdateVendors {
 }
 
 Task Format -Depends DownloadModules {
-    Exec { go fmt .\cmd\famulus\ } -workingDirectory $script:rootFolder
-    Exec { go fmt .\internal\app\famulus\ } -workingDirectory $script:rootFolder
-    Exec { go fmt .\internal\pkg\people\ } -workingDirectory $script:rootFolder
-    Exec { go fmt .\internal\pkg\phone\ } -workingDirectory $script:rootFolder
-    Exec { go fmt .\internal\pkg\scraper\ } -workingDirectory $script:rootFolder
-    Exec { go fmt .\pkg\famulus\cmd\collect } -workingDirectory $script:rootFolder
-    Exec { go fmt .\pkg\famulus\cmd\root } -workingDirectory $script:rootFolder
-    Exec { go fmt .\test\ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./cmd/famulus/ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./internal/app/famulus/ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./internal/pkg/people/ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./internal/pkg/phone/ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./internal/pkg/scraper/ } -workingDirectory $script:rootFolder
+    Exec { go fmt ./pkg/famulus/cmd/collect } -workingDirectory $script:rootFolder
+    Exec { go fmt ./pkg/famulus/cmd/root } -workingDirectory $script:rootFolder
+    Exec { go fmt ./test/ } -workingDirectory $script:rootFolder
 }
 
 Task TidyModules -depends DownloadModules, Format {
@@ -46,7 +46,7 @@ Task BuildWinx64 -Depends PreBuild {
 
     $env:GOOS = "windows"
     $env:GOARCH = "amd64"
-    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task BuildWinx86 -Depends PreBuild {
@@ -55,7 +55,7 @@ Task BuildWinx86 -Depends PreBuild {
     
     $env:GOOS = "windows"
     $env:GOARCH = "386"
-    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task BuildLinux64 -Depends PreBuild {
@@ -64,7 +64,7 @@ Task BuildLinux64 -Depends PreBuild {
 
     $env:GOOS = "linux"
     $env:GOARCH = "amd64"
-    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task Build -Depends BuildWinx64, BuildWinx86, BuildLinux64
@@ -72,5 +72,5 @@ Task Build -Depends BuildWinx64, BuildWinx86, BuildLinux64
 Task Test -depends Build {
     $env:GOOS = ""
     $env:GOARCH = ""
-    Exec { go test .\test\ } -workingDirectory $script:rootFolder
+    Exec { go test ./test/ } -workingDirectory $script:rootFolder
 }
