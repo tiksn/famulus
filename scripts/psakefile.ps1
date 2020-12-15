@@ -34,9 +34,40 @@ Task TidyModules -depends DownloadModules, Format {
     Exec { go mod tidy }
 }
 
-Task Build -depends TidyModules {
-    Exec { go build } -workingDirectory ..\cmd\famulus
+Task PreBuild -Depends TidyModules {
+    $script:publishFolder = Join-Path -Path $script:trashFolder -ChildPath "bin"
+    
+    New-Item -Path $script:publishFolder -ItemType Directory | Out-Null
 }
+
+Task BuildWinx64 -Depends PreBuild {
+    $script:publishWinx64Folder = Join-Path -Path $script:publishFolder -ChildPath "winx64"
+    $outputFile = Join-Path -Path $script:publishWinx64Folder -ChildPath "famulus.exe"
+
+    $env:GOOS = "windows"
+    $env:GOARCH = "amd64"
+    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+}
+
+Task BuildWinx86 -Depends PreBuild {
+    $script:publishWinx86Folder = Join-Path -Path $script:publishFolder -ChildPath "winx86"
+    $outputFile = Join-Path -Path $script:publishWinx86Folder -ChildPath "famulus.exe"
+    
+    $env:GOOS = "windows"
+    $env:GOARCH = "386"
+    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+}
+
+Task BuildLinux64 -Depends PreBuild {
+    $script:publishLinux64Folder = Join-Path -Path $script:publishFolder -ChildPath "linux64"
+    $outputFile = Join-Path -Path $script:publishLinux64Folder -ChildPath "famulus"
+
+    $env:GOOS = "linux"
+    $env:GOARCH = "amd64"
+    Exec { go build -o $outputFile .\cmd\famulus } -workingDirectory $script:rootFolder
+}
+
+Task Build -Depends BuildWinx64, BuildWinx86, BuildLinux64
 
 Task Test -depends Build {
     Exec { go test } -workingDirectory ..\test\
