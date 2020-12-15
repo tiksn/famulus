@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.13
+          go-version: ^1.15.5
         id: go
 
       - name: Check out code into the Go module directory
@@ -32,13 +32,13 @@ jobs:
               dep ensure
           fi
       - name: Prepare PowerShell
-        uses: Amadevus/pwsh-script@v1.0.0
+        uses: Amadevus/pwsh-script@v2.0.0
         with:
           script: |
             Install-Module -Name psake -Force
 
       - name: Build
-        uses: Amadevus/pwsh-script@v1.0.0
+        uses: Amadevus/pwsh-script@v2.0.0
         with:
           script: |
             $psakeResult = Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Build -nologo -notr
@@ -47,7 +47,7 @@ jobs:
             }
 
       - name: Test
-        uses: Amadevus/pwsh-script@v1.0.0
+        uses: Amadevus/pwsh-script@v2.0.0
         with:
           script: |
             $psakeResult = Invoke-psake -buildFile .\\scripts\\psakefile.ps1 -taskList Test -nologo -notr
