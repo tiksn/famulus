@@ -11,7 +11,15 @@ Task Clean -Depends Init {
     Exec { go clean } -workingDirectory $script:rootFolder
 }
 
-Task Format -Depends Clean {
+Task UpdateVendors -depends Clean {
+    Exec { go mod vendor }
+}
+
+Task DownloadModules -depends UpdateVendors {
+    Exec { go mod download }
+}
+
+Task Format -Depends DownloadModules {
     Exec { go fmt .\cmd\famulus\ } -workingDirectory $script:rootFolder
     Exec { go fmt .\internal\app\famulus\ } -workingDirectory $script:rootFolder
     Exec { go fmt .\internal\pkg\people\ } -workingDirectory $script:rootFolder
@@ -20,14 +28,6 @@ Task Format -Depends Clean {
     Exec { go fmt .\pkg\famulus\cmd\collect } -workingDirectory $script:rootFolder
     Exec { go fmt .\pkg\famulus\cmd\root } -workingDirectory $script:rootFolder
     Exec { go fmt .\test\ } -workingDirectory $script:rootFolder
-}
-
-Task UpdateVendors -depends Clean {
-    Exec { go mod vendor }
-}
-
-Task DownloadModules -depends UpdateVendors {
-    Exec { go mod download }
 }
 
 Task TidyModules -depends DownloadModules, Format {
