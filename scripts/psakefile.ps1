@@ -7,11 +7,7 @@ Task Init {
     $script:rootFolder = Resolve-Path -Path ".." -Relative
 }
 
-Task Clean -Depends Init {
-    Exec { go clean } -workingDirectory $script:rootFolder
-}
-
-Task UpdateVendors -depends Clean {
+Task UpdateVendors -depends Init {
     Exec { go mod vendor }
 }
 
@@ -19,7 +15,11 @@ Task DownloadModules -depends UpdateVendors {
     Exec { go mod download }
 }
 
-Task Format -Depends DownloadModules {
+Task Clean -Depends UpdateVendors {
+    Exec { go clean } -workingDirectory $script:rootFolder
+}
+
+Task Format -Depends Clean {
     Exec { go fmt ./cmd/famulus/ } -workingDirectory $script:rootFolder
     Exec { go fmt ./internal/app/famulus/ } -workingDirectory $script:rootFolder
     Exec { go fmt ./internal/pkg/people/ } -workingDirectory $script:rootFolder
