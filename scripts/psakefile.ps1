@@ -42,29 +42,29 @@ Task PreBuild -Depends TidyModules {
 
 Task BuildWinx64 -Depends PreBuild {
     $script:publishWinx64Folder = Join-Path -Path $script:publishFolder -ChildPath "winx64"
-    $outputFile = Join-Path -Path $script:publishWinx64Folder -ChildPath "famulus.exe"
+    $script:publishWinx64OutputFile = Join-Path -Path $script:publishWinx64Folder -ChildPath "famulus.exe"
 
     $env:GOOS = "windows"
     $env:GOARCH = "amd64"
-    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $script:publishWinx64OutputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task BuildWinx86 -Depends PreBuild {
     $script:publishWinx86Folder = Join-Path -Path $script:publishFolder -ChildPath "winx86"
-    $outputFile = Join-Path -Path $script:publishWinx86Folder -ChildPath "famulus.exe"
+    $script:publishWinx86OutputFile = Join-Path -Path $script:publishWinx86Folder -ChildPath "famulus.exe"
     
     $env:GOOS = "windows"
     $env:GOARCH = "386"
-    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $script:publishWinx86OutputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task BuildLinux64 -Depends PreBuild {
     $script:publishLinux64Folder = Join-Path -Path $script:publishFolder -ChildPath "linux64"
-    $outputFile = Join-Path -Path $script:publishLinux64Folder -ChildPath "famulus"
+    $script:publishLinux64OutputFile = Join-Path -Path $script:publishLinux64Folder -ChildPath "famulus"
 
     $env:GOOS = "linux"
     $env:GOARCH = "amd64"
-    Exec { go build -o $outputFile ./cmd/famulus } -workingDirectory $script:rootFolder
+    Exec { go build -o $script:publishLinux64OutputFile ./cmd/famulus } -workingDirectory $script:rootFolder
 }
 
 Task Build -Depends BuildWinx64, BuildWinx86, BuildLinux64
@@ -73,4 +73,26 @@ Task Test -depends Build {
     $env:GOOS = ""
     $env:GOARCH = ""
     Exec { go test ./test/ } -workingDirectory $script:rootFolder
+}
+
+Task CollectArtifacts -depends Test, BuildWinx64, BuildWinx86, BuildLinux64 {
+    $script:artifactsFolder = Join-Path -Path $script:trashFolder -ChildPath 'artifacts'
+    New-Item -Path $script:artifactsFolder -ItemType Directory | Out-Null
+
+    $rootCommandFile = Join-Path -Path $script:rootFolder -ChildPath 'pkg\famulus\cmd\root\root.go'
+    $rootCommandFileContent = Get-Content -Path $rootCommandFile
+    $appVersionLine = $rootCommandFileContent | Where-Object {$_.Contains('AppVersion')} | Where-Object {$_.Contains('=')}
+    $appVersion = ($appVersionLine -split '=')[1].Trim()
+    $appVersion = $appVersion.TrimStart('"')
+    $appVersion = $appVersion.TrimEnd('"')
+    Assert -conditionToCheck ($null -ne $appVersion) -failureMessage 'Version is not provided'
+
+    $script:archiveWinx64 = Join-Path -Path $script:artifactsFolder -ChildPath "famulus-$appVersion-win-x64.zip"
+    Compress-Archive -Path $script:publishWinx64OutputFile -DestinationPath $script:archiveWinx64
+
+    $script:archiveWinx86 = Join-Path -Path $script:artifactsFolder -ChildPath "famulus-$appVersion-win-x86.zip"
+    Compress-Archive -Path $script:publishWinx86OutputFile -DestinationPath $script:archiveWinx86
+
+    $script:archiveLinux64 = Join-Path -Path $script:artifactsFolder -ChildPath "famulus-$appVersion-linux-x64.zip"
+    Compress-Archive -Path $script:publishLinux64OutputFile -DestinationPath $script:archiveLinux64
 }
