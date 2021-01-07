@@ -8,6 +8,10 @@ import (
 	"github.com/tiksn/famulus/pkg/famulus/cmd/collect"
 )
 
+const (
+	AppVersion = "1.0.0"
+)
+
 func NewCmdRoot(c *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "famulus <command> <subcommand> [flags]",
@@ -17,7 +21,7 @@ func NewCmdRoot(c *config.Config) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 
-		Version: "1.0.0",
+		Version: AppVersion,
 	}
 
 	versionOutput := fmt.Sprintf("famulus version %s\n", cmd.Version)
