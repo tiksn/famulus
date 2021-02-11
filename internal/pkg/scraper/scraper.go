@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/text/encoding/charmap"
 )
 
 func ListScrape(url string, phoneUrl string, interval time.Duration) ([]Contact, error) {
@@ -68,7 +69,8 @@ func ContactScrape(url string, phoneUrl string, interval time.Duration) (Contact
 		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
-	doc, err := goquery.NewDocumentFromReader(res.Body)
+	r := charmap.Windows1251.NewDecoder().Reader(res.Body)
+	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
