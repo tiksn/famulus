@@ -75,13 +75,17 @@ Task Test -depends Build {
     Exec { go test ./test/ } -workingDirectory $script:rootFolder
 }
 
+Task InstallLocally -depends Test {
+    Exec { go install ./cmd/famulus } -workingDirectory $script:rootFolder
+}
+
 Task CollectArtifacts -depends Test, BuildWinx64, BuildWinx86, BuildLinux64 {
     $script:artifactsFolder = Join-Path -Path $script:trashFolder -ChildPath 'artifacts'
     New-Item -Path $script:artifactsFolder -ItemType Directory | Out-Null
 
     $rootCommandFile = Join-Path -Path $script:rootFolder -ChildPath 'pkg\famulus\cmd\root\root.go'
     $rootCommandFileContent = Get-Content -Path $rootCommandFile
-    $appVersionLine = $rootCommandFileContent | Where-Object {$_.Contains('AppVersion')} | Where-Object {$_.Contains('=')}
+    $appVersionLine = $rootCommandFileContent | Where-Object { $_.Contains('AppVersion') } | Where-Object { $_.Contains('=') }
     $appVersion = ($appVersionLine -split '=')[1].Trim()
     $appVersion = $appVersion.TrimStart('"')
     $appVersion = $appVersion.TrimEnd('"')
