@@ -76,8 +76,8 @@ func ContactScrape(url string, phoneUrl string, interval time.Duration) (Contact
 	}
 	element := doc.Find("body table:nth-child(8) tbody tr td:nth-child(1) table tbody tr")
 	if element != nil {
-		// fmt.Println(element.Eq(0).Find("td h1").Text())
-		// fmt.Println(strings.TrimSpace(element.Eq(2).Find("td div").Nodes[0].FirstChild.Data))
+		t := element.Eq(0).Find("td h1").Text()
+		d := strings.TrimSpace(element.Eq(2).Find("td div").Nodes[0].FirstChild.Data)
 		onclick, exists := element.Eq(2).Find("td div div input").Attr("onclick")
 		if exists {
 			re := regexp.MustCompile("^\\s*showPhonesWithDigits\\(\\'(?P<id>\\d*)\\',\\s*\\'(?P<key>[A-Fa-f0-9]{40})\\'\\)\\;\\s*return\\s*false\\s*\\;\\s*$")
@@ -89,8 +89,10 @@ func ContactScrape(url string, phoneUrl string, interval time.Duration) (Contact
 			}
 
 			return &contact{
-				numbers: nums,
-				website: url,
+				numbers:     nums,
+				website:     url,
+				title:       t,
+				description: d,
 			}, nil
 		}
 	}
