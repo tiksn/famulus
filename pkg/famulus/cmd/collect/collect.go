@@ -96,7 +96,8 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 				return err
 			}
 
-			err = peopleDB.AddOrUpdate(numbers, []string{contact.GetWebsite()})
+			notes := contact.GetTitle() + " --- " + contact.GetDescription()
+			err = peopleDB.AddOrUpdate(numbers, []string{contact.GetWebsite()}, []string{notes})
 			if err != nil {
 				return err
 			}
