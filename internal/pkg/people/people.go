@@ -138,7 +138,7 @@ func (c *people) AddOrUpdate(phoneNumbers []string, websites []string, notes []s
 
 		updateValues(phoneNumbers, newRecord, c.phoneIndices)
 		updateValues(websites, newRecord, c.websiteIndices)
-		updateValues(notes, c.records[i], c.notesIndices)
+		updateValues(notes, newRecord, c.notesIndices)
 
 		c.records = append(c.records, newRecord)
 	}
