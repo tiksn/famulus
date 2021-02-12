@@ -19,6 +19,7 @@ type people struct {
 	indices        map[string]int
 	phoneIndices   []int
 	websiteIndices []int
+	notesIndices   []int
 	headerRecords  []string
 	records        [][]string
 }
@@ -28,6 +29,7 @@ type getTypeOrdinal func(t string) int
 var theREs = map[string]*regexp.Regexp{
 	"Phone":   regexp.MustCompile("^(?P<type_prefix>(\\w*\\'*(\\s*\\w)*))\\s*Phone\\s*(?P<number>\\d*)\\s*(?P<type_suffix>\\w*)$"),
 	"Website": regexp.MustCompile("^(?P<type_prefix>(\\w*))\\s*Web Page\\s*(?P<number>\\d*)\\s*(?P<type_suffix>\\w*)$"),
+	"Notes":   regexp.MustCompile("^(?P<type_prefix>)Notes(?P<number>)(?P<type_suffix>)$"),
 }
 
 func LoadFromFile(path string) (People, error) {
@@ -51,6 +53,7 @@ func LoadFromFile(path string) (People, error) {
 	categorizedIndices := map[string]map[string]map[int]int{
 		"Phone":   make(map[string]map[int]int),
 		"Website": make(map[string]map[int]int),
+		"Notes":   make(map[string]map[int]int),
 		"Others":  make(map[string]map[int]int),
 	}
 
@@ -90,12 +93,14 @@ func LoadFromFile(path string) (People, error) {
 
 	phoneIndices := orderPhones(categorizedIndices["Phone"])
 	websiteIndices := orderWebsites(categorizedIndices["Website"])
+	notesIndices := orderNotes(categorizedIndices["Notes"])
 	headerRecords := records[0]
 	records = records[1:]
 	return &people{
 		indices:        indices,
 		phoneIndices:   phoneIndices,
 		websiteIndices: websiteIndices,
+		notesIndices:   notesIndices,
 		headerRecords:  headerRecords,
 		records:        records,
 	}, nil
@@ -196,6 +201,10 @@ func orderWebsites(original map[string]map[int]int) []int {
 	return flattenIndexHierarchy(original, getWebsitesTypeOrdinal)
 }
 
+func orderNotes(original map[string]map[int]int) []int {
+	return flattenIndexHierarchy(original, getNotesTypeOrdinal)
+}
+
 func flattenIndexHierarchy(original map[string]map[int]int, getOrdinal getTypeOrdinal) []int {
 	keys := make([]string, 0, len(original))
 	for k := range original {
@@ -251,4 +260,12 @@ func getWebsitesTypeOrdinal(t string) int {
 		return 1<<31 - 1
 	}
 
+}
+func getNotesTypeOrdinal(t string) int {
+	switch t {
+	case "":
+		return 1
+	default:
+		return 1<<31 - 1
+	}
 }
