@@ -15,6 +15,7 @@ type Config interface {
 }
 
 type SourceConfig interface {
+	GetKind() (string, error)
 	GetAddress() (string, error)
 	GetPhoneAddress() (string, error)
 	GetDefaultRegion() (string, error)
@@ -118,6 +119,15 @@ func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
 	}
 
 	return path, nil
+}
+
+func (c *sourceConfig) GetKind() (string, error) {
+	_, sourceValueNode, err1 := findEntry(c.rootNode, "Kind")
+	if err1 != nil {
+		return "", err1
+	}
+
+	return sourceValueNode.Value, nil
 }
 
 func (c *sourceConfig) GetAddress() (string, error) {
