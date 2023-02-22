@@ -9,12 +9,12 @@ import (
 )
 
 type Config interface {
-	ListAddress() ([]string, error)
-	GetAddress(string) (AddressConfig, error)
+	ListSources() ([]string, error)
+	GetSource(string) (SourceConfig, error)
 	GetContactsCsvFilePath() (string, error)
 }
 
-type AddressConfig interface {
+type SourceConfig interface {
 	GetAddress() (string, error)
 	GetPhoneAddress() (string, error)
 	GetDefaultRegion() (string, error)
@@ -24,7 +24,7 @@ type fileConfig struct {
 	documentRoot *yaml.Node
 }
 
-type addressConfig struct {
+type sourceConfig struct {
 	rootNode *yaml.Node
 }
 
@@ -63,21 +63,21 @@ func getMapEntry(node *yaml.Node) (map[string]*yaml.Node, error) {
 	return result, nil
 }
 
-func getAddressMap(c *fileConfig) (map[string]AddressConfig, error) {
-	_, addressesValueNode, err1 := findEntry(c.documentRoot.Content[0], "Addresses")
+func getSourceMap(c *fileConfig) (map[string]SourceConfig, error) {
+	_, sourcesValueNode, err1 := findEntry(c.documentRoot.Content[0], "Sources")
 	if err1 != nil {
 		return nil, err1
 	}
-	addressMap, err2 := getMapEntry(addressesValueNode)
+	sourceMap, err2 := getMapEntry(sourcesValueNode)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	result := make(map[string]AddressConfig)
+	result := make(map[string]SourceConfig)
 
 	/* Copy Content from Map1 to Map2*/
-	for index, element := range addressMap {
-		result[index] = &addressConfig{
+	for index, element := range sourceMap {
+		result[index] = &sourceConfig{
 			rootNode: element,
 		}
 	}
@@ -85,25 +85,25 @@ func getAddressMap(c *fileConfig) (map[string]AddressConfig, error) {
 	return result, nil
 }
 
-func (c *fileConfig) ListAddress() ([]string, error) {
-	addressMap, err := getAddressMap(c)
+func (c *fileConfig) ListSources() ([]string, error) {
+	sourceMap, err := getSourceMap(c)
 	if err != nil {
 		return nil, err
 	}
-	keys := make([]string, 0, len(addressMap))
+	keys := make([]string, 0, len(sourceMap))
 
-	for k := range addressMap {
+	for k := range sourceMap {
 		keys = append(keys, k)
 	}
 	return keys, nil
 }
 
-func (c *fileConfig) GetAddress(name string) (AddressConfig, error) {
-	addressMap, err := getAddressMap(c)
+func (c *fileConfig) GetSource(name string) (SourceConfig, error) {
+	sourceMap, err := getSourceMap(c)
 	if err != nil {
 		return nil, err
 	}
-	return addressMap[name], nil
+	return sourceMap[name], nil
 }
 
 func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
@@ -120,16 +120,16 @@ func (c *fileConfig) GetContactsCsvFilePath() (string, error) {
 	return path, nil
 }
 
-func (c *addressConfig) GetAddress() (string, error) {
-	_, addressValueNode, err1 := findEntry(c.rootNode, "Address")
+func (c *sourceConfig) GetAddress() (string, error) {
+	_, sourceValueNode, err1 := findEntry(c.rootNode, "Address")
 	if err1 != nil {
 		return "", err1
 	}
 
-	return addressValueNode.Value, nil
+	return sourceValueNode.Value, nil
 }
 
-func (c *addressConfig) GetPhoneAddress() (string, error) {
+func (c *sourceConfig) GetPhoneAddress() (string, error) {
 	_, phoneAddressValueNode, err1 := findEntry(c.rootNode, "PhoneAddress")
 	if err1 != nil {
 		return "", err1
@@ -138,7 +138,7 @@ func (c *addressConfig) GetPhoneAddress() (string, error) {
 	return phoneAddressValueNode.Value, nil
 }
 
-func (c *addressConfig) GetDefaultRegion() (string, error) {
+func (c *sourceConfig) GetDefaultRegion() (string, error) {
 	_, regionValueNode, err1 := findEntry(c.rootNode, "Region")
 	if err1 != nil {
 		return "", err1

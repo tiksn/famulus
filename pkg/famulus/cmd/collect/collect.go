@@ -36,7 +36,7 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 	argCount := len(args)
 
 	if argCount == 0 {
-		a, err := c.ListAddress()
+		a, err := c.ListSources()
 		if err != nil {
 			return err
 		}
@@ -45,7 +45,7 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 		}
 		return nil
 	} else if argCount == 1 || argCount == 2 {
-		adr, err := c.GetAddress(args[0])
+		src, err := c.GetSource(args[0])
 		if err != nil {
 			return err
 		}
@@ -70,24 +70,24 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 			return err
 		}
 
-		adrUrl, err := adr.GetAddress()
+		srcUrl, err := src.GetAddress()
 		if err != nil {
 			return err
 		}
-		adrUrl = strings.ReplaceAll(adrUrl, "{page_number}", strconv.Itoa(pageNumber))
+		srcUrl = strings.ReplaceAll(srcUrl, "{page_number}", strconv.Itoa(pageNumber))
 
-		phonrUrl, err := adr.GetPhoneAddress()
+		phonrUrl, err := src.GetPhoneAddress()
 		if err != nil {
 			return err
 		}
 
-		contacts, err := scraper.ListScrape(adrUrl, phonrUrl, interval)
+		contacts, err := scraper.ListScrape(srcUrl, phonrUrl, interval)
 		if err != nil {
 			return err
 		}
 
 		for _, contact := range contacts {
-			region, err := adr.GetDefaultRegion()
+			region, err := src.GetDefaultRegion()
 			if err != nil {
 				return err
 			}
