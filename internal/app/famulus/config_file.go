@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 
@@ -36,7 +36,7 @@ func ParseConfig(filename string) (Config, error) {
 	}
 	defer f.Close()
 
-	data, rerr := ioutil.ReadAll(f)
+	data, rerr := io.ReadAll(f)
 	if rerr != nil {
 		return nil, rerr
 	}
