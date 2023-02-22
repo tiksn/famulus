@@ -17,6 +17,12 @@ func GetScraper(kind string, url string, phoneUrl string, interval time.Duration
 			sourcePhoneAddress: phoneUrl,
 			interval:           interval,
 		}, nil
+	case "B":
+		return &scraperB{
+			sourceAddress:      url,
+			sourcePhoneAddress: phoneUrl,
+			interval:           interval,
+		}, nil
 	default:
 		return nil, errors.New("unknown source kind")
 	}
