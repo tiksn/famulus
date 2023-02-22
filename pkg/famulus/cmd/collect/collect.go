@@ -70,18 +70,28 @@ func collectCmd(c config.Config, args []string, interval time.Duration) error {
 			return err
 		}
 
+		kind, err := src.GetKind()
+		if err != nil {
+			return err
+		}
+
 		srcUrl, err := src.GetAddress()
 		if err != nil {
 			return err
 		}
 		srcUrl = strings.ReplaceAll(srcUrl, "{page_number}", strconv.Itoa(pageNumber))
 
-		phonrUrl, err := src.GetPhoneAddress()
+		phoneUrl, err := src.GetPhoneAddress()
 		if err != nil {
 			return err
 		}
 
-		contacts, err := scraper.ListScrape(srcUrl, phonrUrl, interval)
+		kindScraper, err := scraper.GetScraper(kind, srcUrl, phoneUrl, interval)
+		if err != nil {
+			return err
+		}
+
+		contacts, err := kindScraper.ListScrape()
 		if err != nil {
 			return err
 		}
