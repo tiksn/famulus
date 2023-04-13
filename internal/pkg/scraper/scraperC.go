@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -98,7 +97,7 @@ func (c *scraperC) contactScrape(url string, phoneUrl string, interval time.Dura
 				desc := sDescription.Text()
 				desc = strings.TrimSpace(desc)
 				descriptions[lang] = desc
-				log.Printf("[%s]: %s", lang, desc)
+				fmt.Printf("[%s]: %s", lang, desc)
 			}
 		})
 
@@ -124,7 +123,7 @@ func (c *scraperC) numbersScrape(element *goquery.Selection, phoneUrl string, in
 
 		href, exists := contactElement.Attr("href")
 		if exists && href != "#" {
-			log.Printf("Contact Reference is %s", href)
+			fmt.Printf("Contact Reference is %s", href)
 		}
 	})
 
