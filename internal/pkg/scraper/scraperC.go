@@ -98,6 +98,7 @@ func (c *scraperC) contactScrape(url string, phoneUrl string, interval time.Dura
 				desc = strings.TrimSpace(desc)
 				descriptions[lang] = desc
 				fmt.Printf("[%s]: %s", lang, desc)
+				fmt.Println()
 			}
 		})
 
@@ -109,7 +110,7 @@ func (c *scraperC) contactScrape(url string, phoneUrl string, interval time.Dura
 		}, nil
 	}
 
-	return nil, errors.New("Unable to find contact information")
+	return nil, errors.New("unable to find contact information")
 }
 
 func (c *scraperC) numbersScrape(element *goquery.Selection, phoneUrl string, interval time.Duration) (string, error) {
@@ -124,6 +125,7 @@ func (c *scraperC) numbersScrape(element *goquery.Selection, phoneUrl string, in
 		href, exists := contactElement.Attr("href")
 		if exists && href != "#" {
 			fmt.Printf("Contact Reference is %s", href)
+			fmt.Println()
 		}
 	})
 
