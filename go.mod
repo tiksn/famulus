@@ -3,7 +3,7 @@ module github.com/tiksn/famulus
 go 1.22
 
 require (
-	github.com/PuerkitoBio/goquery v1.9.0
+	github.com/PuerkitoBio/goquery v1.9.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/nyaruka/phonenumbers v1.3.2
 	github.com/spf13/cobra v1.8.0
