@@ -9,8 +9,9 @@ on:
 jobs:
 
   lint:
+    name: Lint
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Super-Linter
       uses: github/super-linter@v5
