@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/nyaruka/phonenumbers v1.3.5
+	github.com/nyaruka/phonenumbers v1.3.6
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/text v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
