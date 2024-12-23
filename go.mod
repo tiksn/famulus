@@ -6,7 +6,7 @@ toolchain go1.23.1
 require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/nyaruka/phonenumbers v1.4.3
+	github.com/nyaruka/phonenumbers v1.4.4
 	github.com/spf13/cobra v1.8.1
 	golang.org/x/text v0.21.0
 	gopkg.in/yaml.v3 v3.0.1
