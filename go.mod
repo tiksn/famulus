@@ -1,12 +1,12 @@
 module github.com/tiksn/famulus
 
 go 1.22
-toolchain go1.23.1
+toolchain go1.24.1
 
 require (
 	github.com/PuerkitoBio/goquery v1.10.2
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/nyaruka/phonenumbers v1.5.0
+	github.com/nyaruka/phonenumbers v1.6.0
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/text v0.23.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -17,8 +17,8 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	golang.org/x/exp v0.0.0-20240525044651-4c93da0ed11d // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.35.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
