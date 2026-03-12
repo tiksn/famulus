@@ -1,15 +1,13 @@
 module github.com/tiksn/famulus
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/nyaruka/phonenumbers v1.6.11
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/text v0.34.0
+	golang.org/x/text v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
